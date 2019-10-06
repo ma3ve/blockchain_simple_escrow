@@ -1,16 +1,18 @@
-pragma solidity >=0.4.22 <0.6.0;
-contract mycontract {
-    string value;
-    constructor() public
-    {
-        value="myvalue"
+pragma solidity >=0.4.22 <0.7.0;
+contract escrow {
+    address agent;
+    mapping(address=>uint256) deposits; 
+    constructor() public{
+        agent = msg.sender;      }
+    modifier onlyagent(){
+        require(agent == msg.sender);  
+        _;
     }
-    function get() public view returns(string)
-    {
-        return value;
+    function deposit (address depositor) public onlyagent payable {
+        deposits[depositor] = deposits[depositor]+msg.value;
     }
-    function set(string _value)public
-    {
-        value=_value;
+    function withdraw(address payable withdrawer) public onlyagent{
+        withdrawer.transfer(deposits[withdrawer]);
+        deposits[withdrawer]=0;
     }
 }
